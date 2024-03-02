@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { FormService } from './form.service';
 
 @Controller()
@@ -6,7 +6,15 @@ export class FormController {
   constructor(private readonly formService: FormService) {}
 
   @Get(':id/filteredResponses')
-  filteredResponses(@Param('id') id: string) {
-    return id;
+  async filteredResponses(
+    @Param('id') id: string,
+    @Query('filters') filters: string,
+  ) {
+    const filterObjects = filters ? JSON.parse(filters) : [];
+    const responses = await this.formService.fetchAndFilterFormResponses(
+      id,
+      filterObjects,
+    );
+    return responses;
   }
 }
